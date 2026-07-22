@@ -1,0 +1,94 @@
+# Configuration for HetGAT model type
+type: "HetGAT"
+
+architecture:
+    node_initialization:
+        type: "preprocessed"
+        # Node preprocessor configuration
+        preprocessor:
+            input_channels: 950
+            output_channels: 64
+            layers:
+                - hidden_channels: 512
+                - hidden_channels: 256
+                - hidden_channels: 64
+
+    # List of encoders for different edge types
+    encoders:
+        - type: "virtual"
+          input_channels: 64
+          layers:
+              - type: "VirtualDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "VirtualDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+
+        - type: "real"
+          input_channels: 64
+          layers:
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+
+    # Edge predictor configuration
+    predictor:
+        output_channels: 1
+        node_feature_dim: 64
+        edge_feature_dim: 2
+        layers:
+            - hidden_channels: 64
+
+# The 'transforms' section defines how the data should be prepared for this model.
+transforms:
+    pre:
+        # Pre-transforms: basic graph structure
+        - builder: "nodes_add_demand"
+        - builder: "nodes_add_net_demand"
+
+        - builder: "virtual_edges_add_index"
+
+        - builder: "real_edges_add_index"
+
+        - builder: "real_edges_add_capacity"
+        - builder: "real_edges_add_free_flow_time"
+
+        - builder: "real_edges_add_vcr"
+        - builder: "real_edges_add_flow"
+
+    post:
+        # Post-transforms: feature assembly with scaling
+        - scaler:
+              type: ["nodes"]
+              feature: "demand"
+              transform: "minmax"
+              factor: 1
+        - builder: "nodes_add_demand_as_x"
+        - builder: "nodes_add_padding"
+        - scaler:
+              type: ["nodes", "real", "nodes"]
+              feature: "edge_capacity"
+              transform: "minmax"
+              factor: 1
+        - scaler:
+              type: ["nodes", "real", "nodes"]
+              feature: "edge_free_flow_time"
+              transform: "minmax"
+              factor: 1
+        - builder: "real_edges_stack_capacity_free_flow_scaled"

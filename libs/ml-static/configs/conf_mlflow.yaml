@@ -1,0 +1,4 @@
+# Local file-based MLflow tracking (no server required)
+tracking_uri: ./mlruns
+experiment: "GUIDED-HetGAT"
+

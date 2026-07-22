@@ -1,0 +1,84 @@
+architecture:
+  encoders:
+  - input_channels: 64
+    layers:
+    - hidden_channels: 64
+      num_heads: 8
+      type: VirtualDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: VirtualDependentAttentionLayer
+    type: virtual
+  - input_channels: 64
+    layers:
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    - hidden_channels: 64
+      num_heads: 8
+      type: RealDependentAttentionLayer
+    type: real
+  node_initialization:
+    preprocessor:
+      input_channels: 950
+      layers:
+      - hidden_channels: 512
+      - hidden_channels: 256
+      - hidden_channels: 64
+      output_channels: 64
+    type: preprocessed
+  predictor:
+    edge_feature_dim: 2
+    layers:
+    - hidden_channels: 64
+    node_feature_dim: 64
+    output_channels: 1
+transforms:
+  post:
+  - scaler:
+      factor: 1
+      feature: demand
+      transform: minmax
+      type:
+      - nodes
+  - builder: nodes_add_demand_as_x
+  - builder: nodes_add_padding
+  - scaler:
+      factor: 1
+      feature: edge_capacity
+      transform: minmax
+      type:
+      - nodes
+      - real
+      - nodes
+  - scaler:
+      factor: 1
+      feature: edge_free_flow_time
+      transform: minmax
+      type:
+      - nodes
+      - real
+      - nodes
+  - builder: real_edges_stack_capacity_free_flow_scaled
+  pre:
+  - builder: nodes_add_demand
+  - builder: nodes_add_net_demand
+  - builder: virtual_edges_add_index
+  - builder: real_edges_add_index
+  - builder: real_edges_add_capacity
+  - builder: real_edges_add_free_flow_time
+  - builder: real_edges_add_vcr
+  - builder: real_edges_add_flow
+type: HetGAT

@@ -1,0 +1,102 @@
+# # Example experiment suite for batch training
+# # This file defines multiple experiments that will be run sequentially
+# # Each experiment updates conf_run.yaml before training, then restores it afterward
+
+experiments:
+  #### Experiment B: Training on small dataset ==================================
+
+  ## === Anaheim === ##
+  # baseline model
+  - name: anaheim_base_lm
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: anaheim_a_small
+        dataset.max_nodes: 950
+
+  - name: anaheim_base_dirich
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: anaheim_b_small
+        dataset.max_nodes: 950
+
+  # linear init
+  - name: anaheim_linear_init
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: anaheim_a_small
+
+  - name: anaheim_linear_init_dirich
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: anaheim_b_small
+
+  # rbf init
+  - name: anaheim_rbf_init
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: anaheim_a_small
+
+  - name: anaheim_rbf_init_dirich
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: anaheim_b_small
+
+  ## === Chicago === ##
+  # baseline model
+  - name: chicago_base_lm
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: chicago_a_small
+        dataset.max_nodes: 950
+
+  - name: chicago_base_dirich
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: chicago_b_small
+        dataset.max_nodes: 950
+
+  # linear init
+  - name: chicago_linear_init
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: chicago_a_small
+
+  - name: chicago_linear_init_dirich
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: chicago_b_small
+
+  # rbf init
+  - name: chicago_rbf_init
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: chicago_a_small
+
+  - name: chicago_rbf_init_dirich
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: chicago_b_small

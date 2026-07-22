@@ -1,0 +1,25 @@
+[project]
+name = "scenario-generation"
+version = "0.1.0"
+description = "Scripts for tntp file conversion and scenario generation"
+readme = "README.md"
+authors = [
+    { name = "scal-o", email = "alex.scalese@virgilio.it" }
+]
+requires-python = "==3.13.*"
+dependencies = [
+    "click>=8.3.0",
+    "geopandas>=1.1.1",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "scipy>=1.16.3",
+    "shapely>=2.1.2",
+    "tqdm>=4.67.1",
+]
+
+[project.scripts]
+scenarios = "scenario_generation.scenarios:cli"
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"

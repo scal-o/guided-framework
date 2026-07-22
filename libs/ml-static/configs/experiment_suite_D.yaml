@@ -1,0 +1,1839 @@
+# # Example experiment suite for batch training
+# # This file defines multiple experiments that will be run sequentially
+# # Each experiment updates conf_run.yaml before training, then restores it afterward
+
+experiments:
+  #### Experiment D: Inter-Network Transfer Learning & Layer Sensitivity Analysis =========================================
+  ## list of experiments for each model / dataset combination
+
+  ## On Dataset A (LM): 
+  ## - zero-shot
+  ## - preprocessing layers
+  ## - predictor head
+  ## - preprocessing layers + predictor head
+  ## - last r-encoder layers + predictor head
+  ## - last v-encoder layers + predictor head
+  ## - preprocessing layers, last r-encoder layers, predictor head
+  ## - preprocessing layers, last v-encoder layers, predictor head
+  ## - last v-encoder layers, last r-encoder layers, predictor head
+  ## - preprocessing layers, last v-encoder layers, last r-encoder layers, predictor head
+  ## - full model
+
+  ## On Dataset B (dirichlet): 
+  ## - zero-shot 
+  ## - preprocessing layers
+  ## - predictor head
+  ## - preprocessing layers + predictor head
+  ## - last r-encoder layers + predictor head
+  ## - last v-encoder layers + predictor head
+  ## - preprocessing layers, last r-encoder layers, predictor head
+  ## - preprocessing layers, last v-encoder layers, predictor head
+  ## - last v-encoder layers, last r-encoder layers, predictor head 
+  ## - preprocessing layers, last v-encoder layers, last r-encoder layers, predictor head 
+  ## - full model 
+
+  ## === Anaheim to Chicago - Dataset A === ##
+
+  # baseline model
+#   - name: "baseline an_to_ch A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: preproc_padded
+#           dataset.max_nodes: 950
+#           dataset.name: chicago_a_small
+#           training.init.run_id: "preproc_padded on anaheim_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "baseline an_to_ch A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "baseline an_to_ch A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "baseline an_to_ch A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "baseline an_to_ch A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline an_to_ch A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline an_to_ch A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_a_small
+          training.init.run_id: "preproc_padded on anaheim_a (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGAT-lin model
+#   - name: "linear_init an_to_ch A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: linear_init
+#           dataset.name: chicago_a_small
+#           training.init.run_id: "linear_init on anaheim_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "linear_init an_to_ch A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "linear_init an_to_ch A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "linear_init an_to_ch A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "linear_init an_to_ch A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init an_to_ch A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init an_to_ch A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "linear_init on anaheim_a (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGAT-rbf model
+#   - name: "rbf_init an_to_ch A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: rbf_init
+#           dataset.name: chicago_a_small
+#           training.init.run_id: "rbf_init on anaheim_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "rbf_init an_to_ch A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "rbf_init an_to_ch A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "rbf_init an_to_ch A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "rbf_init an_to_ch A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init an_to_ch A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init an_to_ch A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_a_small
+          training.init.run_id: "rbf_init on anaheim_a (run)"
+          training.freeze.enabled: false
+
+  ## === Chicago to Anaheim - Dataset A === ##
+
+  # baseline model
+#   - name: "baseline ch_to_an A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: preproc_padded
+#           dataset.max_nodes: 950
+#           dataset.name: anaheim_a_small
+#           training.init.run_id: "preproc_padded on chicago_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "baseline ch_to_an A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "baseline ch_to_an A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "baseline ch_to_an A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "baseline ch_to_an A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline ch_to_an A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline ch_to_an A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_a_small
+          training.init.run_id: "preproc_padded on chicago_a (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGAT-lin model
+#   - name: "linear_init ch_to_an A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: linear_init
+#           dataset.name: anaheim_a_small
+#           training.init.run_id: "linear_init on chicago_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "linear_init ch_to_an A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "linear_init ch_to_an A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "linear_init ch_to_an A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "linear_init ch_to_an A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init ch_to_an A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init ch_to_an A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "linear_init on chicago_a (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGAT-rbf model
+#   - name: "rbf_init ch_to_an A: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: rbf_init
+#           dataset.name: anaheim_a_small
+#           training.init.run_id: "rbf_init on chicago_a (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "rbf_init ch_to_an A: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "rbf_init ch_to_an A: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "rbf_init ch_to_an A: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "rbf_init ch_to_an A: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an A: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init ch_to_an A: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an A: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init ch_to_an A: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an A: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an A: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_a_small
+          training.init.run_id: "rbf_init on chicago_a (run)"
+          training.freeze.enabled: false
+
+
+
+
+
+
+  ## === Anaheim to Chicago - Dataset B === ##
+
+  # baseline model
+#   - name: "baseline an_to_ch B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: preproc_padded
+#           dataset.max_nodes: 950
+#           dataset.name: chicago_dirichlet_unif_small
+#           training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "baseline an_to_ch B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "baseline an_to_ch B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "baseline an_to_ch B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "baseline an_to_ch B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline an_to_ch B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline an_to_ch B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline an_to_ch B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGBT-lin model
+#   - name: "linear_init an_to_ch B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: linear_init
+#           dataset.name: chicago_dirichlet_unif_small
+#           training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "linear_init an_to_ch B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "linear_init an_to_ch B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "linear_init an_to_ch B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "linear_init an_to_ch B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init an_to_ch B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init an_to_ch B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init an_to_ch B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "linear_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGBT-rbf model
+#   - name: "rbf_init an_to_ch B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: rbf_init
+#           dataset.name: chicago_dirichlet_unif_small
+#           training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "rbf_init an_to_ch B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "rbf_init an_to_ch B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "rbf_init an_to_ch B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "rbf_init an_to_ch B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init an_to_ch B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init an_to_ch B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init an_to_ch B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: chicago_dirichlet_unif_small
+          training.init.run_id: "rbf_init on anaheim_dirichlet_unif (run)"
+          training.freeze.enabled: false
+
+  ## === Chicago to Anaheim - Dataset B === ##
+
+  # baseline model
+#   - name: "baseline ch_to_an B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: preproc_padded
+#           dataset.max_nodes: 950
+#           dataset.name: anaheim_dirichlet_unif_small
+#           training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "baseline ch_to_an B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "baseline ch_to_an B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "baseline ch_to_an B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "baseline ch_to_an B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline ch_to_an B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "baseline ch_to_an B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "baseline ch_to_an B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: preproc_padded
+          dataset.max_nodes: 950
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "preproc_padded on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGBT-lin model
+#   - name: "linear_init ch_to_an B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: linear_init
+#           dataset.name: anaheim_dirichlet_unif_small
+#           training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "linear_init ch_to_an B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "linear_init ch_to_an B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "linear_init ch_to_an B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "linear_init ch_to_an B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init ch_to_an B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "linear_init ch_to_an B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "linear_init ch_to_an B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: linear_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "linear_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: false
+
+
+  # VE-HetGBT-rbf model
+#   - name: "rbf_init ch_to_an B: zero-shot"
+#     template: finetune
+#     updates:
+#       config:
+#           model.name: rbf_init
+#           dataset.name: anaheim_dirichlet_unif_small
+#           training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+#           training.freeze.enabled: true
+#           training.freeze.exclude:
+#               - node_initializer
+#               - encoders
+#               - predictor
+
+  - name: "rbf_init ch_to_an B: preprocessing layers"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+              - predictor
+  
+  - name: "rbf_init ch_to_an B: predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+
+  - name: "rbf_init ch_to_an B: preprocessing layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+  
+  - name: "rbf_init ch_to_an B: last r-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an B: last v-encoder layers + predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init ch_to_an B: preprocessing layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an B: preprocessing layers, last v-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+
+  - name: "rbf_init ch_to_an B: last v-encoder layers, last r-encoder layers, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - node_initializer
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an B: preproc, last v-encoder, last r-encoder, predictor head"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: true
+          training.freeze.exclude:
+              - encoders
+          training.freeze.keep:
+              - encoders.0.encoder_layers.1
+              - encoders.1.encoder_layers.4
+              - encoders.1.encoder_layers.5
+
+  - name: "rbf_init ch_to_an B: full model"
+    template: finetune
+    updates:
+      config:
+          model.name: rbf_init
+          dataset.name: anaheim_dirichlet_unif_small
+          training.init.run_id: "rbf_init on chicago_dirichlet_unif (run)"
+          training.freeze.enabled: false
+

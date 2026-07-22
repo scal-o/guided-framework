@@ -1,0 +1,53 @@
+dataset:
+  max_nodes: 950
+  name: anaheim_b
+  path: data
+early_stopping:
+  enabled: true
+  mode: min
+  patience: 30
+  warmup_epochs: 150
+loss:
+  curriculum:
+    enabled: true
+    schedule:
+    - component: conservation
+      end_epoch: 150
+      end_value: 0.003
+      kind: sigmoid_ramp
+      start_epoch: 100
+      start_value: 0.0
+    - component: conservation
+      from_epoch: 151
+      kind: constant
+      value: 0.003
+  mask_evaluation: full
+  mask_ratio: 0.1
+  mask_type: full
+  type: custom
+  w_conservation: 0
+  w_flow: 0.003
+  w_vcr: 1.0
+model:
+  name: preproc_padded
+optimizer:
+  learning_rate: 0.001
+  type: adam
+scheduler:
+  factor: 0.5
+  patience: 20
+  type: reduce_on_plateau
+  warmup_epochs: 150
+training:
+  batch_size: 16
+  epochs: 700
+  mode: run
+  seed: null
+  target:
+    post:
+    - scaler:
+        factor: 1
+        target: y
+        transform: minmax
+    pre:
+    - builder: target_vcr

@@ -1,0 +1,28 @@
+[project]
+name = "static-assignment"
+version = "0.1.0"
+description = "Scripts to run static assignment on various network scenarios"
+readme = "README.md"
+authors = [
+    { name = "scal-o", email = "alex.scalese@virgilio.it" }
+]
+requires-python = "==3.13.*"
+dependencies = [
+    "aequilibrae>=1.5.0",
+    "click>=8.3.0",
+    "folium>=0.20.0",
+    "geopandas>=1.1.1",
+    "mapclassify>=2.10.0",
+    "matplotlib>=3.10.7",
+    "numpy<=2.3.4",
+    "openmatrix>=0.3.5.0",
+    "tqdm>=4.67.1",
+]
+
+[project.scripts]
+sta = "static_assignment.sta:cli"
+
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"

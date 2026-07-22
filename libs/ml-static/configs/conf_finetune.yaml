@@ -1,0 +1,99 @@
+# Baseline fine-tuning configuration template for ml-static.
+#
+# Intended usage:
+# - Use with the batch experiment suite `template: finetune` (batch_runner).
+# - Or run directly via `uv run train -c configs/conf_finetune.yaml`.
+#
+# Notes:
+# - `training.mode: finetune` initializes the model from an MLflow run via RunContext.
+# - If `training.init.run_id` is omitted, the "last run" is used (convenient for rapid iteration).
+# - Optimizer state is NOT loaded; fine-tuning always starts with a fresh optimizer/scheduler.
+# - Optional: freeze subsets of parameters (substring match on model.named_parameters()).
+
+model:
+    # Model name is only used to resolve the model config YAML (conf_model_<name>.yaml).
+    # The actual *model architecture and weights* in finetune mode come from the base run.
+    name: HetGAT
+
+dataset:
+    # Override these per experiment for transfer learning
+    name: null
+    path: data
+
+training:
+    mode: finetune
+    epochs: 400
+    batch_size: 8
+    seed: null
+
+    # Optional parameter freezing (fine-tuning)
+    # Use `exclude` and `keep` lists. Parameters matching any substring in `exclude`
+    # will be frozen unless they also match a substring in `keep` (keep takes precedence).
+    # Example: exclude: ["encoder"]  keep: ["encoder.special_layer"]
+    freeze:
+        enabled: false
+        exclude: []
+        keep: []
+
+    init:
+        source: mlflow_run
+        # Optional. If omitted/null, defaults to the last run in the configured MLflow experiment.
+        run_id: null
+        download_path: downloaded_models
+        force_download: false
+
+    target:
+        post:
+            - scaler:
+                  factor: 1
+                  target: y
+                  transform: minmax
+        pre:
+            - builder: target_vcr
+
+optimizer:
+    # Fine-tuning defaults: lower LR than scratch training
+    type: adam
+    learning_rate: 0.0005
+
+scheduler:
+    # Conservative scheduler defaults for finetuning
+    type: reduce_on_plateau
+    factor: 0.5
+    patience: 15
+
+    # During curriculum ramps the total validation loss can increase temporarily
+    # (because the loss definition changes). Skip ReduceLROnPlateau stepping
+    # for the first N epochs to avoid premature LR reductions.
+    warmup_epochs: 125
+
+early_stopping:
+    enabled: true
+    patience: 40
+    mode: min
+
+    # Same rationale as scheduler warmup: don't early-stop while curriculum
+    # is still ramping in new loss terms.
+    warmup_epochs: 125
+
+loss:
+    # Physics-informed loss (recommended for finetuning)
+    type: custom
+    w_vcr: 1.0
+    w_flow: 0.003
+
+    # In fine-tuning, conservation is often introduced gradually to avoid destabilizing
+    w_conservation: 0.000
+    curriculum:
+        enabled: true
+        schedule:
+            - kind: sigmoid_ramp
+              component: conservation
+              start_value: 0.0
+              end_value: 0.003
+              start_epoch: 101
+              end_epoch: 125
+            - kind: constant
+              value: 0.003
+              component: conservation
+              from_epoch: 126

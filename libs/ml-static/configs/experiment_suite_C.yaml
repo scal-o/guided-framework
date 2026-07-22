@@ -1,0 +1,119 @@
+# Experiment Suite for Experiment C: Semi-Supervised Inference with Partial Observability
+# Evaluates model capacity to reconstruct unobserved macroscopic network states under 50% link flow masking.
+
+experiments:
+  #### Experiment C: Semi-Supervised Inference (50% Link Masking) ===================
+
+  ## === Anaheim === ##
+  - name: anaheim_base_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: anaheim_a
+        dataset.max_nodes: 950
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: anaheim_base_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: anaheim_b
+        dataset.max_nodes: 950
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: anaheim_linear_init_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: anaheim_a
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: anaheim_linear_init_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: anaheim_b
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: anaheim_rbf_init_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: anaheim_a
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: anaheim_rbf_init_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: anaheim_b
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  ## === Chicago === ##
+  - name: chicago_base_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: chicago_a
+        dataset.max_nodes: 950
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: chicago_base_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: preproc_padded
+        dataset.name: chicago_b
+        dataset.max_nodes: 950
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: chicago_linear_init_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: chicago_a
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: chicago_linear_init_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: linear_init
+        dataset.name: chicago_b
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: chicago_rbf_init_semi_a
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: chicago_a
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5
+
+  - name: chicago_rbf_init_semi_b
+    template: run
+    updates:
+      config: 
+        model.name: rbf_init
+        dataset.name: chicago_b
+        loss.mask_mode: random
+        loss.mask_ratio: 0.5

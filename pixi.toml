@@ -1,0 +1,49 @@
+[workspace]
+authors = ["scal-o <alessandro.scalese@tum.de>"]
+channels = ["conda-forge"]
+name = "guided-framework"
+platforms = [
+    { platform = "win-64", cuda = "13.0" },
+    { platform = "linux-64", cuda = "13.0" },
+]
+version = "0.1.0"
+
+[tasks]
+
+[feature.scenario-generation.tasks]
+initialize = "scenarios initialize"
+generate = "scenarios generate"
+
+[feature.static-assignment.tasks]
+run = "sta run"
+test = "sta test"
+
+[feature.ml-static.tasks]
+train = "train"
+train-suite = "train-suite"
+
+[dependencies]
+python = "3.13.*"
+ipython = ">=9.12.0,<10"
+
+[feature.ml-static.pypi-dependencies]
+ml-static = { path = './libs/ml-static', editable = true }
+tensorboard = ">=2.20.0, <3"
+torch-tb-profiler = ">=0.4.3, <0.5"
+
+[feature.ml-static.dependencies]
+cuda-version = "13.0.*"
+
+[feature.scenario-generation.pypi-dependencies]
+scenario-generation = { path = './libs/scenario-generation', editable = true }
+
+[feature.static-assignment.pypi-dependencies]
+static-assignment = { path = './libs/static-assignment', editable = true }
+
+[feature.ml-compile.dependencies]
+cuda-nvcc = "*"
+
+[environments]
+ml-static = ["ml-static", "ml-compile"]
+scenario-generation = ["scenario-generation"]
+static-assignment = ["static-assignment"]

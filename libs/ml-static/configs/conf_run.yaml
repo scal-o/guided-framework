@@ -1,0 +1,100 @@
+# Baseline run configuration template for ml-static.
+#
+# Intended usage:
+# - Use with the batch experiment suite `template: run` (batch_runner).
+# - Or run directly via `uv run train -c configs/conf_run.yaml`.
+
+model:
+    # Model name resolves the model config YAML (conf_model_<name>.yaml).
+    # Default for single runs: linear_init. Overridden in experiment suites.
+    name: linear_init 
+
+dataset:
+    # Default dataset for single runs: anaheim_a. Overridden in experiment suites.
+    name: anaheim_a
+    path: data
+
+training:
+    mode: run
+    epochs: 700
+    batch_size: 16
+    seed: null
+
+    # Define training target with builder / scaler transforms
+    # Default: set vcr as target with minmax scaling. 
+    # Override per experiment as needed.
+    target:
+        post:
+            - scaler:
+                  factor: 1
+                  target: y
+                  transform: minmax
+        pre:
+            - builder: target_vcr
+
+optimizer:
+    type: adam
+    learning_rate: 0.001
+
+scheduler:
+    type: reduce_on_plateau
+    factor: 0.5
+    patience: 20
+
+    # During curriculum ramps the total validation loss can increase temporarily
+    # (because the loss definition changes). Skip ReduceLROnPlateau stepping
+    # for the first N epochs to avoid premature LR reductions.
+    warmup_epochs: 150
+
+early_stopping:
+    enabled: true
+    patience: 30
+    mode: min
+
+    # Same rationale as scheduler warmup: don't early-stop while curriculum
+    # is still ramping in new loss terms.
+    warmup_epochs: 150
+
+loss:
+    # Type defines the loss used in the training loop. Options: 
+    # - l1: mean absolute error
+    # - l2 | mse: mean squared error
+    # - rmsn: root mean squared error
+    # - custom (default): physics-informed loss with configurable weights
+    # - learnable: physics-informed loss with learnable weights (not used yet)
+    type: custom
+
+    # Weights for custom physics-informed loss components
+    w_vcr: 1.0
+    w_flow: 0.003
+    w_conservation: 0
+
+    # Curriculum learning schedule for w_conservation
+    curriculum:
+        # Enable / disable curriculum learning entirely
+        enabled: true
+        schedule:
+            - kind: sigmoid_ramp
+              component: conservation
+              start_value: 0.0
+              end_value: 0.003
+              start_epoch: 100
+              end_epoch: 150
+            - kind: constant
+              value: 0.003
+              component: conservation
+              from_epoch: 151
+
+    # Masking parameters for semi-supervised learning
+    # mask_type defines the masking strategy for the loss computation. Options:
+    # - full: compute loss on all nodes (default)
+    # - predefined: use a predefined mask (saved with the dataset), with selection based on mask_ratio
+    # - random: use a randomized mask (generated at the start of training), with selection based on mask_ratio
+    mask_type: full
+    # mask_ratio defines the fraction of nodes to include in the loss computation
+    # Ignored if mask_type is 'full'.
+    mask_ratio: 0.10
+    # mask_evaluation defines the masking strategy for the computation of the validation loss and metrics. Options are the same as mask_type. Often set to 'full' even when training with a mask, to evaluate performance on all nodes.
+    # - full (default): compute validation loss on all nodes - used for all normal experiments
+    # - unobserved: compute validation loss only on the unobserved links - used in the semi-supervised experiments
+    mask_evaluation: full

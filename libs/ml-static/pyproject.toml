@@ -1,0 +1,49 @@
+[project]
+name = "ml-static"
+version = "0.1.0"
+description = "Definition of a machine learning model for static traffic assignment"
+readme = "README.md"
+authors = [
+    { name = "scal-o", email = "alex.scalese@virgilio.it" }
+]
+requires-python = "==3.13.*"
+dependencies = [
+    "geopandas>=1.1.1",
+    "mlflow==3.5.1",
+    "openmatrix>=0.3.5.0",
+    "tabulate>=0.9.0",
+    "torch>=2.8.0",
+    "torch-geometric==2.7",
+    "numpy<=2.4"
+]
+
+[project.scripts]
+create-dataset = "ml_static.data:create_dataset"
+train = "ml_static.run:train_model"
+train-suite = "ml_static.batch_runner:train_suite"
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"
+
+
+[dependency-groups]
+dev = [
+    "folium>=0.20.0",
+    "mapclassify>=2.10.0",
+    "matplotlib>=3.10.7",
+    "tabulate>=0.9.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu130"},
+]
+torchvision = [
+  { index = "pytorch-cu130"},
+]

@@ -1,0 +1,105 @@
+# Configuration for HetGAT with learnable RBF Edge Processor (OD Initialization)
+# Target: Anaheim network
+type: "HetGAT"
+
+architecture:
+    # Node initialization strategy: Aggregate virtual edges (OD demand)
+    node_initialization:
+        type: "from_demand"
+
+        # 1. Edge processor: scalar demand -> edge embedding
+        edge_processor:
+            type: "rbf"
+            num_centers: 20
+            demand_min: 0.0
+            demand_max: 100.0
+            sigma: 5.0
+            learnable_sigma: true # <--- Requested: Learnable sigma
+            mlp:
+                input_channels: 20
+                output_channels: 32
+                layers:
+                    - hidden_channels: 32
+
+        od_initializer: {}
+
+        # 2. Node preprocessor: processes aggregated embeddings (32*2 = 64)
+        preprocessor:
+            input_channels: 64
+            output_channels: 64
+            layers:
+                - hidden_channels: 64
+
+    # Graph Encoders
+    encoders:
+        - type: "virtual"
+          input_channels: 64
+          layers:
+              - type: "VirtualDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+                edge_embedding_dim: 32
+              - type: "VirtualDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+                edge_embedding_dim: 32
+
+        - type: "real"
+          input_channels: 64
+          layers:
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+              - type: "RealDependentAttentionLayer"
+                hidden_channels: 64
+                num_heads: 8
+
+    # Edge predictor configuration (predicts y per real edge)
+    predictor:
+        output_channels: 1
+        node_feature_dim: 64
+        edge_feature_dim: 2
+        layers:
+            - hidden_channels: 64
+
+# Transforms required for this architecture
+transforms:
+    pre:
+        - builder: "nodes_add_net_demand"
+        - builder: "virtual_edges_add_index"
+        - builder: "virtual_edges_add_demand"
+        - builder: "real_edges_add_index"
+        - builder: "real_edges_add_capacity"
+        - builder: "real_edges_add_free_flow_time"
+        - builder: "real_edges_add_vcr"
+        - builder: "real_edges_add_flow"
+
+    post:
+        - scaler:
+              type: ["nodes", "virtual", "nodes"]
+              feature: "edge_demand"
+              transform: "minmax"
+              factor: 100
+        - scaler:
+              type: ["nodes", "real", "nodes"]
+              feature: "edge_capacity"
+              transform: "minmax"
+              factor: 1
+        - scaler:
+              type: ["nodes", "real", "nodes"]
+              feature: "edge_free_flow_time"
+              transform: "minmax"
+              factor: 1
+        - builder: "real_edges_stack_capacity_free_flow_scaled"
