@@ -9,16 +9,18 @@ This package implements the machine learning models, loss functions, and experim
 ## Key Features
 
 1. **GUIDED-HetGAT Architecture (`models/`)**:
-   - **GUIDED Feature Initialization**: Projects scalar travel demand $d_q$ on virtual links into 32-dim edge embeddings $\mathbf{e}_q$ (via linear MLP or Gaussian RBF expansion), followed by directional scatter-sum aggregation into initial physical node embeddings $\mathbf{x}_v^{(0)} = [\mathbf{x}_{\text{out},v} \parallel \mathbf{x}_{\text{in},v}] \in \mathbb{R}^{64}$.
+   - **GUIDED Feature Initialization**: Projects scalar travel demand $d_q$ on virtual links into 32-dim edge embeddings $e_q$ (via linear MLP or Gaussian RBF expansion), followed by directional scatter-sum aggregation into initial physical node embeddings:
+     $$x_v^{(0)} = [x_{\text{out},v} \parallel x_{\text{in},v}] \in \mathbb{R}^{64}$$
    - **Heterogeneous Graph Encoders**: Stack of Virtual Encoder (V-Encoder) and Real Encoder (R-Encoder) attention layers.
    - **Edge Flow Predictor**: Dedicated MLP predicting link Volume-to-Capacity Ratio ($V/C$).
 
 2. **Physics-Informed Loss Function (`losses.py`)**:
-   - Composite loss $\mathcal{L} = \lambda_v \mathcal{L}_v + \lambda_f \mathcal{L}_f + \lambda_c \mathcal{L}_c$:
-     - $\mathcal{L}_v$: Supervised V/C prediction error (MAE).
+   - Composite loss function:
+     $$\mathcal{L} = \lambda_v \mathcal{L}_v + \lambda_f \mathcal{L}_f + \lambda_c \mathcal{L}_c$$
+     - $\mathcal{L}_v$: Supervised $V/C$ prediction error (MAE).
      - $\mathcal{L}_f$: Supervised link flow error (PCE).
      - $\mathcal{L}_c$: Physics-based node flow conservation penalty.
-   - **Curriculum Learning (`loss_curriculum.py`)**: Sigmoid ramp schedule introducing conservation penalty $\mathcal{L}_c$ after initial V/C convergence.
+   - **Curriculum Learning (`loss_curriculum.py`)**: Sigmoid ramp schedule introducing conservation penalty $\mathcal{L}_c$ after initial $V/C$ convergence.
 
 3. **Experiment Suite Automation (`batch_runner.py`)**:
    - Automated sequential execution of experiment suites matching paper evaluation phases A through D:

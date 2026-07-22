@@ -14,7 +14,7 @@ This package powers the data pipeline described in **"GUIDED Network-Agnostic Fe
 
 2. **Scenario Generation (`scenarios generate`)**:
    - **Dataset A (Random Uniform Scaling)**: Simulates nominal daily traffic variations by applying random capacity reduction $\delta_r \sim U(0.5, 1.0)$ and uniform demand scaling $\delta_{ij} \sim U(0.5, 1.5)$.
-   - **Dataset B (Dirichlet Distribution Shift)**: Simulates out-of-distribution, structurally novel demand patterns by applying random capacity reduction $\delta_r \sim U(0.5, 1.0)$ and redistributing total network demand via a symmetric Dirichlet distribution $\mathbf{p} \sim \text{Dir}(\alpha \cdot \mathbf{1}_K)$ with concentration parameter $\alpha = 0.05$.
+   - **Dataset B (Dirichlet Distribution Shift)**: Simulates out-of-distribution, structurally novel demand patterns by applying random capacity reduction $\delta_r \sim U(0.5, 1.0)$ and redistributing total network demand via a symmetric Dirichlet distribution $p \sim \text{Dir}(\alpha)$ with concentration parameter $\alpha = 0.05$.
    - **Deterministic & Parallelized**: Uses scenario-specific random seeds for 100% reproducible scenario generation and supports multi-core parallel processing.
 
 ---
