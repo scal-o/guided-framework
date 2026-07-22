@@ -1,7 +1,9 @@
 # GUIDED Network-Agnostic Feature Initialization for Spatial Transferability in GNN-based Models
 
 Official PyTorch implementation of the paper:
-**"GUIDED Network-Agnostic Feature Initialization for Spatial Transferability in GNN-based Models"** (Scalese et al., 2026).
+[**"GUIDED Network-Agnostic Feature Initialization for Spatial Transferability in GNN-based Models"**](https://arxiv.org/abs/2607.19270) (Scalese et al., 2026).
+
+[![arXiv](https://img.shields.io/badge/arXiv-2607.19270-b31b1b.svg)](https://arxiv.org/abs/2607.19270)
 
 ---
 
@@ -18,7 +20,7 @@ To overcome this structural limitation, this research proposes a network-agnosti
 The project is organized as a modular workspace containing three standalone Python packages under `libs/`:
 
 ```text
-code/
+./
 ├── libs/
 │   ├── scenario-generation/     # TNTP ingestion & stochastic demand/capacity scenario generator
 │   ├── static-assignment/       # AequilibraE User Equilibrium (UE) traffic assignment solver
@@ -106,6 +108,23 @@ All training metrics, effective YAML configurations, and model checkpoints are s
 pixi run -e ml-static mlflow ui
 ```
 Then open `http://127.0.0.1:5000` in your web browser.
+
+---
+
+## Citation
+
+If you use this codebase or the GUIDED framework in your research, please cite our paper:
+
+```bibtex
+@article{scalese2026guided,
+  author = {Scalese, Alessandro and Narayanan, Santhanakrishnan and Antoniou, Constantinos},
+  title = {GUIDED Network-Agnostic Feature Initialization for Spatial Transferability in GNN-based Models},
+  journal = {arXiv preprint arXiv:2607.19270},
+  year = {2026},
+  eprint = {2607.19270},
+  archiveprefix = {arXiv}
+}
+```
 
 ---
 
